@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="40c85678-135a-4008-82c2-da4f35fc8620" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="PrivateFlow" doc:id="4c2a60eb-4f95-4b95-9234-38a9e759b5d7" >
+		<logger level="INFO" doc:name="Logger" doc:id="0b606d46-f4a9-4bb6-8157-809396bc5a2d" message='#["Start of the Private Flow"]'/>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="17186a43-04e1-477a-b0db-f9c6a8080505" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="074e9973-5ef0-4397-bbb9-5b9908e8a9d2" >
+				<set-payload value='#["Value B"]' doc:name="Set Payload" doc:id="554aea62-f5da-47a0-bbea-4ef775489e67" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="testquizFlow" doc:id="d9d1f178-5a42-44da-a242-6d13f390a82f" >
+		<http:listener doc:name="Listener" doc:id="0f41da7d-3842-4ba2-b0cb-c177fbe22c9a" config-ref="HTTP_Listener_config" path="test">
+			<http:error-response >
+				<http:body ><![CDATA[#[output text/plain --- payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<set-payload value='#["Value A"]' doc:name="Set Payload" doc:id="346331d8-0feb-4c38-8956-671255b53f74" />
+		<flow-ref doc:name="Flow Reference" doc:id="3d5d4fd6-f068-4035-b344-d6f74350e729" name="PrivateFlow"/>
+		<set-payload value='#["Value D"]' doc:name="Set Payload" doc:id="8196b9b7-374d-4bf2-a3ea-05ad6b2b0834" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f80b0b59-38e8-402b-aabd-d3718a0b7de2" type="EXPRESSION">
+				<set-payload value='#["Value C"]' doc:name="Set Payload" doc:id="2e68eca3-5762-4bc3-a942-03eb9a3d40cc" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
